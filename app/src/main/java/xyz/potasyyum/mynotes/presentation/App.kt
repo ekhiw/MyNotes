@@ -6,11 +6,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.orhanobut.logger.Logger
 
 
 @Composable
 fun App() {
     val navController = rememberNavController()
+    Logger.d("hello");
 
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {

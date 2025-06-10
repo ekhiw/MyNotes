@@ -1,4 +1,4 @@
-package xyz.potasyyum.mynotes.ui.theme
+package xyz.potasyyum.mynotes.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build
