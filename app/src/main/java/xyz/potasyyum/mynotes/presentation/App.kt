@@ -24,19 +24,6 @@ fun App() {
             Column {
 
                 TaskView()
-                Button(onClick = {
-                    Logger.i("EKHIW")
-                    taskViewModel.addTaskItem(
-                        TaskEntity(title = "test" , desc = "deskripsi")
-                    )
-                }) {
-                    Text("TEST")
-                }
-                Button(onClick = {
-                    Logger.i("EKHIW2 ${taskViewModel.taskList.value.size}")
-                }) {
-                    Text("TEST 2")
-                }
             }
         }
     }
