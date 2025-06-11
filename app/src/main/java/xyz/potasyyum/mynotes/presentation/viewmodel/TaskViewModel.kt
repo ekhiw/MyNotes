@@ -37,6 +37,12 @@ class TaskViewModel @Inject constructor(
         }
     }
 
+    fun updateTaskItem(taskEntity: TaskEntity) {
+        viewModelScope.launch {
+            taskRepository.updateTask(taskEntity)
+        }
+    }
+
     fun toggleTask(taskEntity: TaskEntity) {
         viewModelScope.launch {
             val updatedTask = taskEntity.copy(status = !taskEntity.status)
