@@ -20,11 +20,15 @@ logger = "2.2.0"
 roomRuntime = "2.7.1"
 runtimeLivedata = "1.8.2"
 mockk = "1.14.2"
+roboelectric = "4.14"
+test-core = "1.6.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = 'mockk'}
+roboelectric = { group = "org.robolectric", name = "robolectric", version.ref = "roboelectric"}
+test-core = { group = "androidx.test", name = "core", version.ref = "test-core"}
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
@@ -68,6 +72,7 @@ logger = {group = "com.orhanobut", name = "logger" , version.ref = "logger"}
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-room-ktx = {module = "androidx.room:room-ktx", version.ref ="roomRuntime"}
+androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "roomRuntime" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }
