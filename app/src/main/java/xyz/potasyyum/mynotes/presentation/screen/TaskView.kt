@@ -34,6 +34,8 @@ fun TaskView(
 ) {
     val taskList by taskViewModel.taskList.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
+    var dialogEditMode by remember { mutableStateOf(false) }
+    var taskToEdit by remember { mutableStateOf<TaskEntity?>(null) }
     
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -80,8 +82,10 @@ fun TaskView(
                             task = task,
                             onToggleTask = { taskViewModel.toggleTask(it) },
                             onDeleteTask = { taskViewModel.removeTask(it) },
-                            onEditTask = {
-                                Logger.i("EKHIW edit")
+                            onEditTask = { task ->
+                                taskToEdit = task
+                                dialogEditMode = true
+                                showAddDialog = true
                             }
                         )
                     }
@@ -108,11 +112,29 @@ fun TaskView(
 
     if (showAddDialog) {
         AddTaskDialog(
-            onDismiss = { showAddDialog = false },
+            isEditMode = dialogEditMode,
+            onDismiss = {
+                showAddDialog = false
+                if (dialogEditMode) {
+                    taskToEdit = null
+                    dialogEditMode = false;
+                }
+                        },
+            taskToEdit = taskToEdit,
             onAddTask = { title, description ->
-                taskViewModel.addTaskItem(
-                    TaskEntity(title = title, desc = description)
-                )
+                if (dialogEditMode) {
+                    taskToEdit?.let { task ->
+                        taskViewModel.updateTaskItem(
+                            task.copy(title = title, desc = description)
+                        )
+                    }
+                    taskToEdit = null
+                    dialogEditMode = false
+                } else {
+                    taskViewModel.addTaskItem(
+                        TaskEntity(title = title, desc = description)
+                    )
+                }
                 showAddDialog = false
             }
         )
@@ -241,16 +263,17 @@ fun EmptyTask() {
             )
         }
     }
-
 }
 
 @Composable
 fun AddTaskDialog(
+    isEditMode: Boolean = false,
+    taskToEdit: TaskEntity? = null,
     onDismiss: () -> Unit,
     onAddTask: (String, String) -> Unit
 ) {
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
+    var title by remember { mutableStateOf(taskToEdit?.title ?: "") }
+    var description by remember { mutableStateOf(taskToEdit?.desc ?: "") }
     var titleError by remember { mutableStateOf(false) }
     
     Dialog(onDismissRequest = onDismiss) {
@@ -265,7 +288,7 @@ fun AddTaskDialog(
                 modifier = Modifier.padding(24.dp)
             ) {
                 Text(
-                    text = "Add New Task",
+                    text = if (isEditMode) "Edit Task" else "Add New Task",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -326,7 +349,7 @@ fun AddTaskDialog(
                         },
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("Add Task")
+                        Text(if (isEditMode) "Update Task" else "Add Task")
                     }
                 }
             }
