@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.converter)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.coil)
+    implementation(libs.coil.svg)
     implementation(libs.coroutines.android)
     implementation(libs.coroutines.core)
     implementation(libs.hilt.android)
