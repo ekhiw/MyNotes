@@ -1,6 +1,8 @@
 package xyz.potasyyum.mynotes.presentation.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import xyz.potasyyum.mynotes.model.TaskEntity
+import xyz.potasyyum.mynotes.model.TaskFilter
 import xyz.potasyyum.mynotes.repository.TaskRepository
 import javax.inject.Inject
 
@@ -15,21 +18,12 @@ import javax.inject.Inject
 class TaskViewModel @Inject constructor(
     private val taskRepository: TaskRepository
 ) : ViewModel() {
-    
-    private val _taskList = MutableStateFlow<List<TaskEntity>>(emptyList())
-    val taskList: StateFlow<List<TaskEntity>> = _taskList.asStateFlow()
+    private val _selectedFilter = MutableStateFlow(TaskFilter.ALL)
+    val selectedFilter: StateFlow<TaskFilter> = _selectedFilter.asStateFlow()
 
-    init {
-        getAllTasks()
-    }
-
-    private fun getAllTasks() {
-        viewModelScope.launch {
-            taskRepository.getAllTasks().collect { tasks ->
-                _taskList.value = tasks
-            }
-        }
-    }
+    var filteredTask : LiveData<List<TaskEntity>> = taskRepository.getFilteredTasks(_selectedFilter.value).asLiveData()
+    val totalTaskCount: LiveData<Int> = taskRepository.getTotalTaskCount().asLiveData()
+    val completedTaskCount: LiveData<Int> = taskRepository.getCompletedTaskCount().asLiveData()
 
     fun addTaskItem(taskEntity: TaskEntity) {
         viewModelScope.launch {
@@ -53,6 +47,13 @@ class TaskViewModel @Inject constructor(
     fun removeTask(taskEntity: TaskEntity) {
         viewModelScope.launch {
             taskRepository.deleteTask(taskEntity)
+        }
+    }
+
+    fun setFilter(filter: TaskFilter) {
+        _selectedFilter.value = filter
+        viewModelScope.launch {
+            filteredTask = taskRepository.getFilteredTasks(_selectedFilter.value).asLiveData()
         }
     }
 }

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -18,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.ImageLoader
@@ -26,16 +28,22 @@ import coil3.svg.SvgDecoder
 import com.orhanobut.logger.Logger
 import xyz.potasyyum.mynotes.R
 import xyz.potasyyum.mynotes.model.TaskEntity
+import xyz.potasyyum.mynotes.model.TaskFilter
 import xyz.potasyyum.mynotes.presentation.viewmodel.TaskViewModel
 
 @Composable
 fun TaskView(
     taskViewModel: TaskViewModel = hiltViewModel()
 ) {
-    val taskList by taskViewModel.taskList.collectAsState()
+    val taskList by taskViewModel.filteredTask.observeAsState(emptyList())
+    val selectedFilter by taskViewModel.selectedFilter.collectAsState()
+    val totalTaskCount by taskViewModel.totalTaskCount.observeAsState(0)
+    val completedTaskCount by taskViewModel.completedTaskCount.observeAsState(0)
     var showAddDialog by remember { mutableStateOf(false) }
     var dialogEditMode by remember { mutableStateOf(false) }
     var taskToEdit by remember { mutableStateOf<TaskEntity?>(null) }
+
+    Logger.i("EKHIW TASK = ${taskList.joinToString(", ")}")
     
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -62,10 +70,34 @@ fun TaskView(
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
-                        text = "${taskList.size} tasks • ${taskList.count { it.status }} completed",
+                        text = "${totalTaskCount} tasks • ${completedTaskCount} completed",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
                         modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                TaskFilter.entries.forEach { filter ->
+                    FilterChip(
+                        onClick = { taskViewModel.setFilter(filter) },
+                        label = { 
+                            Text(
+                                text = filter.displayName,
+                                style = MaterialTheme.typography.labelMedium
+                            ) 
+                        },
+                        selected = selectedFilter == filter,
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     )
                 }
             }
@@ -181,6 +213,9 @@ fun TaskItem(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
+                StatusBadge(
+                    isCompleted = task.status
+                )
                 Text(
                     text = task.title,
                     style = MaterialTheme.typography.titleMedium,
@@ -356,6 +391,32 @@ fun AddTaskDialog(
         }
     }
 }
+
+@Composable
+fun StatusBadge(
+    isCompleted: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        color = if (isCompleted) 
+            MaterialTheme.colorScheme.primaryContainer
+        else 
+            MaterialTheme.colorScheme.secondaryContainer
+    ) {
+        Text(
+            text = if (isCompleted) "Completed" else "Pending",
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+            color = if (isCompleted)
+                MaterialTheme.colorScheme.onPrimaryContainer
+            else
+                MaterialTheme.colorScheme.onSecondaryContainer,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        )
+    }
+}
+
 
 @Composable
 fun SvgImage(drawable : Any) {

@@ -22,4 +22,16 @@ interface TaskDao {
 
     @Delete
     suspend fun delete(taskEntity: TaskEntity)
+
+    @Query("SELECT * FROM ${TASK_TABLE_NAME} WHERE status = 0")
+    fun getPendingTasks(): Flow<List<TaskEntity>>
+
+    @Query("SELECT * FROM ${TASK_TABLE_NAME} WHERE status = 1")
+    fun getCompletedTasks(): Flow<List<TaskEntity>>
+
+    @Query("SELECT COUNT(*) FROM ${TASK_TABLE_NAME}")
+    fun getTotalTaskCount(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM ${TASK_TABLE_NAME} WHERE status = 1")
+    fun getCompletedTaskCount(): Flow<Int>
 }
