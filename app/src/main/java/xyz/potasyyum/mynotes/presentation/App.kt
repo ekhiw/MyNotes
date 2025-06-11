@@ -7,16 +7,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.orhanobut.logger.Logger
+import xyz.potasyyum.mynotes.presentation.screen.TaskView
+import xyz.potasyyum.mynotes.presentation.viewmodel.TaskViewModel
 
 
 @Composable
 fun App() {
     val navController = rememberNavController()
-    Logger.d("hello");
+    val taskViewModel = hiltViewModel<TaskViewModel>()
 
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
-            Text("HOME")
+            TaskView()
         }
     }
 }
